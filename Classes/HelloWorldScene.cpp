@@ -18,5 +18,15 @@ bool HelloWorld::init()
     if ( !Layer::init() ) return false;
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("CutTheVerlet.plist");
+    Sprite *background = Sprite::createWithSpriteFrameName("bg.png");
+    background->setPosition(visibleSize.width/2, visibleSize.height/2);
+    this->addChild(background ,-1);
+    
+    croc_ = Sprite::createWithSpriteFrameName("croc_front_mouthclosed.png");
+    croc_->setAnchorPoint(Vec2(1,0));
+    croc_->setPosition(Vec2(320.0, 30.0));
+    this->addChild(croc_ ,1);
     return true;
 }
