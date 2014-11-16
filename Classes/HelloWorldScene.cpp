@@ -30,10 +30,8 @@ bool HelloWorld::init()
     croc_->setPosition(Vec2(320.0, 30.0));
     this->addChild(croc_ ,1);
     
-    ropes = Array::create();
-    candies = Array::create();
-    ropeSpriteSheet = SpriteBatchNode::create("rope_texture.png",100);
-    this->addChild(ropeSpriteSheet);
+    ropeSpriteSheet = SpriteBatchNode::create("rope_texture.png",1000);
+    this->addChild(ropeSpriteSheet,999);
     
     _world = new b2World(b2Vec2(0.0f, -8.0f));
     
@@ -53,12 +51,14 @@ bool HelloWorld::init()
     groundBody->CreateFixture(&groundShapeDef);
     
     initLevel();
+    this->scheduleUpdate();
     return true;
 }
 
 b2Body * HelloWorld::createCandyAt(Vec2 pt) {
      // Get the sprite from the sprite sheet
     Sprite *sprite = Sprite::createWithSpriteFrameName("pineapple.png");
+    sprite->setPosition(pt);
     this->addChild(sprite);
  
     // Defines the body of your candy
@@ -90,13 +90,13 @@ b2Body * HelloWorld::createCandyAt(Vec2 pt) {
     fixtureDef.filter.maskBits = 0x01;
     body->CreateFixture(&fixtureDef);
  
-    candies->addObject((Ref*)body);
+    candies.push_back(body);
  
     return body;
 }
 
 
-void HelloWorld::createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Vec2 anchorB, float32 sag)
+void HelloWorld::createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Vec2 anchorB, float sag)
 {
     b2RopeJointDef jd;
     jd.bodyA = bodyA;
@@ -105,21 +105,21 @@ void HelloWorld::createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Ve
     jd.localAnchorB = anchorB;
  
     // Max length of joint = current distance between bodies * sag
-    float32 ropeLength = (bodyA->GetWorldPoint(anchorA) - bodyB->GetWorldPoint(anchorB)).Length() * sag;
+    float ropeLength = (bodyA->GetWorldPoint(anchorA) - bodyB->GetWorldPoint(anchorB)).Length() * sag;
     jd.maxLength = ropeLength;
  
     // Create joint
     b2RopeJoint *ropeJoint = (b2RopeJoint *)_world->CreateJoint(&jd);
  
-    VRope *newRope = new VRope(ropeJoint,ropeSpriteSheet);
+    VRope *newRope = new VRope(ropeJoint, ropeSpriteSheet);
     
-    ropes->addObject((Ref*)newRope);
+    ropes.push_back(newRope);
 }
 
 
 void HelloWorld::initLevel()
 {
-    Size s = Director::getInstance()->getWinSize();
+    Size s = Director::getInstance()->getVisibleSize();
  
     // Add the candy
     b2Body *body1 = createCandyAt(Vec2(s.width * 0.5, s.height * 0.7));
@@ -137,3 +137,23 @@ void HelloWorld::initLevel()
                         groundBody ,cc_to_b2Vec(s.width * 0.83, s.height * 0.6),
                           1.1);
 }
+
+void HelloWorld::update(float dt) {
+    _world->Step(dt,10,10);
+    for (b2Body* b = _world->GetBodyList(); b; b = b->GetNext())
+    {
+        Sprite *myActor = (Sprite*)b->GetUserData();
+        if (myActor)
+        {
+            //Synchronize the AtlasSprites position and rotation with the corresponding body
+            myActor->setPosition(Vec2( b->GetPosition().x * PTM_RATIO, b->GetPosition().y * PTM_RATIO));
+            myActor->setRotation(-1 * CC_RADIANS_TO_DEGREES(b->GetAngle()));
+        }
+    }
+    // Update all the ropes
+    for (unsigned int i = 0; i < ropes.size(); i++) {
+        ropes[i]->update(dt);
+        ropes[i]->updateSprites();
+    }
+}
+

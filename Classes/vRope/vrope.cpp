@@ -30,8 +30,8 @@ using namespace cocos2d;
 VRope::VRope(b2RopeJoint* joint, CCSpriteBatchNode* ropeBatchNode)
     : joint(joint), spriteSheet(ropeBatchNode)
 {
-    Vec2 pointA = Vec2(jointAB->GetAnchorA().x*PTM_RATIO,jointAB->GetAnchorA().y*PTM_RATIO);
-    Vec2 pointB = Vec2(jointAB->GetAnchorB().x*PTM_RATIO,jointAB->GetAnchorB().y*PTM_RATIO);
+    Vec2 pointA = Vec2(joint->GetAnchorA().x*PTM_RATIO,joint->GetAnchorA().y*PTM_RATIO);
+    Vec2 pointB = Vec2(joint->GetAnchorB().x*PTM_RATIO,joint->GetAnchorB().y*PTM_RATIO);
     createRope(pointA, pointB,joint->GetMaxLength()*PTM_RATIO);
 }
 

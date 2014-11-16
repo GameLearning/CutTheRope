@@ -11,13 +11,14 @@ public:
     static cocos2d::Scene* createScene();
     virtual bool init();
     CREATE_FUNC(HelloWorld);
+    void update(float dt);
 private:
     b2Body * createCandyAt(cocos2d::Vec2 pt);
-    void createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Vec2 anchorB, float32 sag);
+    void createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Vec2 anchorB, float sag);
     void initLevel();
     cocos2d::Sprite* croc_;
-    cocos2d::Array *ropes;
-    cocos2d::Array *candies;
+    std::vector<VRope*> ropes;
+    std::vector<b2Body*> candies;
     b2Body* groundBody;
     b2World *_world;
     cocos2d::SpriteBatchNode *ropeSpriteSheet;
