@@ -89,7 +89,7 @@ void VRope::createRope(const CCPoint& pointA, const CCPoint& pointB, float dista
 
             float f = spriteSheet->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
             CCRect r = CCRectMake(0, 0, multiplier, f);
-            CCSprite* tmpSprite = CCSprite::createWithTexture(spriteSheet->getTexture(), r);
+            Sprite* tmpSprite = Sprite::createWithTexture(spriteSheet->getTexture(), r);
             
             Texture2D::TexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
             tmpSprite->getTexture()->setTexParameters(&params);

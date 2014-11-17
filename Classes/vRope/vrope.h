@@ -33,7 +33,7 @@
 #include <vector>
 
 //PTM_RATIO defined here is for testing purposes, it should obviously be the same as your box2d world or, better yet, import a common header where PTM_RATIO is defined
-#define PTM_RATIO 100
+#define PTM_RATIO 32.0
 
 class VRope
 {
