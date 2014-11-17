@@ -207,3 +207,7 @@ void VRope::removeSprites()
 	}
     ropeSprites.clear();
 }
+
+std::vector<VStick*> VRope::getSticks() {
+    return vSticks;
+}

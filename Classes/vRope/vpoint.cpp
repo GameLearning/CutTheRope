@@ -85,3 +85,6 @@ CCPoint VPoint::getGravity()
     return CCPointMake(vPointGravityX, vPointGravityY);
 }
 
+Vec2 VPoint::getPoint() {
+    return Vec2(x,y);
+}

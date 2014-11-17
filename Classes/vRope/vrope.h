@@ -51,7 +51,7 @@ public:
     void debugDraw();
     void updateSprites();
     void removeSprites();
-
+    std::vector<VStick*> getSticks();
 private:
     int numPoints;
 	

@@ -18,7 +18,7 @@ bool HelloWorld::init()
     // 1. super init first
     if ( !Layer::init() ) return false;
     
-    Size visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
 
     SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("CutTheVerlet.plist");
     Sprite *background = Sprite::createWithSpriteFrameName("bg.png");
@@ -52,6 +52,11 @@ bool HelloWorld::init()
     
     initLevel();
     this->scheduleUpdate();
+    
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+    listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
     return true;
 }
 
@@ -177,3 +182,31 @@ bool HelloWorld::checkLineIntersection(Vec2 p1,Vec2 p2, Vec2 p3, Vec2 p4)
     return false;
 }
 
+bool HelloWorld::onTouchBegan(Touch* touch, Event* unused_event){
+    return true;
+}
+
+void HelloWorld::onTouchMoved(Touch* touch, Event* unused_event){
+    Vec2 pt0 = touch->getPreviousLocationInView();
+    Vec2 pt1 = touch->getLocationInView();
+ 
+    // Correct Y axis coordinates to cocos2d coordinates
+    pt0.y = visibleSize.height - pt0.y;
+    pt1.y = visibleSize.height - pt1.y;
+    
+    
+    for (unsigned int i = 0; i < ropes.size(); i++) {
+        auto sticks = ropes[i]->getSticks();
+        for (unsigned int x = 0; x < sticks.size(); x++) {
+            auto stick = sticks[x];
+            Vec2 pa = stick->getPointA()->getPoint();
+            Vec2 pb = stick->getPointB()->getPoint();
+ 
+            if (checkLineIntersection(pt0 ,pt1 ,pa ,pb))
+            {
+                // Cut the rope here
+                return;
+            }
+        }
+    }
+}

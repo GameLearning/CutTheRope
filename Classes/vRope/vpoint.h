@@ -46,6 +46,7 @@ public:
     float x;
     float y;
     
+    cocos2d::Vec2 getPoint();
 private:
     float oldx;
     float oldy;
