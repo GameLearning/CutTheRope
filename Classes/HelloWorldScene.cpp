@@ -157,3 +157,23 @@ void HelloWorld::update(float dt) {
     }
 }
 
+
+bool HelloWorld::checkLineIntersection(Vec2 p1,Vec2 p2, Vec2 p3, Vec2 p4)
+{
+    // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+    float denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+ 
+    // In this case the lines are parallel so you assume they don't intersect
+    if (denominator == 0.0f)
+        return false;
+    float ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
+    float ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
+ 
+    if (ua >= 0.0 && ua <= 1.0 && ub >= 0.0 && ub <= 1.0)
+    {
+        return true;
+    }
+ 
+    return false;
+}
+
