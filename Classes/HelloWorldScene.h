@@ -20,6 +20,8 @@ private:
     void initLevel();
     bool checkLineIntersection(cocos2d::Vec2 p1, cocos2d::Vec2 p2, cocos2d::Vec2 p3, cocos2d::Vec2 p4);
     b2Body * createRopeTipBody();
+    void openCrocMouth(float dt);
+    void closeCrocMouth(float dt);
     
     cocos2d::Sprite* croc_;
     std::vector<VRope*> ropes;
@@ -28,4 +30,6 @@ private:
     b2World *_world;
     cocos2d::SpriteBatchNode *ropeSpriteSheet;
     cocos2d::Size visibleSize;
+    b2Body *crocMouth_;
+    b2Fixture *crocMouthBottom_;
 };

@@ -50,8 +50,19 @@ bool HelloWorld::init()
     groundShape.Set(b2Vec2(visibleSize.width /PTM_RATIO,visibleSize.height /PTM_RATIO),b2Vec2(0,visibleSize.height /PTM_RATIO));
     groundBody->CreateFixture(&groundShapeDef);
     
+    b2BodyDef crocBodyDef;
+    crocBodyDef.position.Set((visibleSize.width - croc_->getTextureRect().size.width)/PTM_RATIO, (croc_->getPosition().y)/PTM_RATIO);
+ 
+    crocMouth_ = _world->CreateBody(&crocBodyDef);
+
+    b2EdgeShape crocBox;
+    crocBox.Set(b2Vec2(5.0/PTM_RATIO,15.0/PTM_RATIO), b2Vec2(45.0/PTM_RATIO,15.0/PTM_RATIO));
+    crocMouthBottom_ = crocMouth_->CreateFixture(&crocBox,0);
+    crocMouth_->SetActive(false);
+    
     initLevel();
     this->scheduleUpdate();
+    openCrocMouth(0);
     
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
@@ -233,4 +244,22 @@ b2Body * HelloWorld::createRopeTipBody()
     body->CreateFixture(&circleDef);
  
     return body;
+}
+
+void HelloWorld::openCrocMouth(float dt) {
+    croc_->setDisplayFrame(SpriteFrameCache::sharedSpriteFrameCache()->getSpriteFrameByName("croc_front_mouthopen.png"));
+    croc_->setZOrder(1);
+    crocMouth_->SetActive(true);
+
+    float interval = 3.0 + 2.0 * rand_0_1();
+    this->scheduleOnce(schedule_selector(HelloWorld::closeCrocMouth), interval);
+}
+
+void HelloWorld::closeCrocMouth(float dt) {
+    croc_->setDisplayFrame(SpriteFrameCache::sharedSpriteFrameCache()->getSpriteFrameByName("croc_front_mouthclosed.png"));
+    croc_->setZOrder(-1);
+    crocMouth_->SetActive(false);
+
+    float interval = 3.0 + 2.0 * rand_0_1();
+    this->scheduleOnce(schedule_selector(HelloWorld::openCrocMouth), interval);
 }
