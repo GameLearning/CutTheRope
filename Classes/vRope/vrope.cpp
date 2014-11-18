@@ -270,4 +270,7 @@ VRope* VRope::cutRopeInStick(int nPoint, VStick* stick, b2Body* newBodyA, b2Body
 
 VRope::VRope(b2RopeJoint* joint, CCSpriteBatchNode* batchNode,std::vector<VPoint*> points,
         std::vector< VStick *> sticks, std::vector<Sprite*> sprites )
-        : joint(joint), spriteSheet(batchNode), vPoints(points), vSticks(sticks), ropeSprites(sprites) {}
+        : joint(joint), spriteSheet(batchNode), vPoints(points), vSticks(sticks), ropeSprites(sprites)
+{
+    numPoints = vPoints.size();
+}

@@ -19,6 +19,7 @@ private:
     void createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Vec2 anchorB, float sag);
     void initLevel();
     bool checkLineIntersection(cocos2d::Vec2 p1, cocos2d::Vec2 p2, cocos2d::Vec2 p3, cocos2d::Vec2 p4);
+    b2Body * createRopeTipBody();
     
     cocos2d::Sprite* croc_;
     std::vector<VRope*> ropes;

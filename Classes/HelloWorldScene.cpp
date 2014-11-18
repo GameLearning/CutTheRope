@@ -55,7 +55,7 @@ bool HelloWorld::init()
     
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-    listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+    listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
     return true;
 }
@@ -205,8 +205,32 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* unused_event){
             if (checkLineIntersection(pt0 ,pt1 ,pa ,pb))
             {
                 // Cut the rope here
+                b2Body *newBodyA = this->createRopeTipBody();
+                b2Body *newBodyB = this->createRopeTipBody();
+ 
+                VRope *newRope = ropes[i]->cutRopeInStick(x, stick ,newBodyA ,newBodyB);
+                ropes.push_back(newRope);
                 return;
             }
         }
     }
+}
+
+b2Body * HelloWorld::createRopeTipBody()
+{
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.linearDamping = 0.5f;
+    b2Body *body = _world->CreateBody(&bodyDef);
+ 
+    b2FixtureDef circleDef;
+    b2CircleShape circle;
+    circle.m_radius = 1.0/PTM_RATIO;
+    circleDef.shape = &circle;
+    circleDef.density = 10.0f;
+ 
+    circleDef.filter.maskBits = 0;
+    body->CreateFixture(&circleDef);
+ 
+    return body;
 }
