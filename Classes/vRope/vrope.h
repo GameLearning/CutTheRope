@@ -39,6 +39,8 @@ class VRope
 {
 public:
     VRope(b2RopeJoint *joint,  cocos2d::CCSpriteBatchNode* ropeBatchNode);
+    VRope(b2RopeJoint* joint, cocos2d::CCSpriteBatchNode* batchNode, std::vector<VPoint*> points,
+        std::vector< VStick *> sticks, std::vector<cocos2d::Sprite*> sprites );
     virtual ~VRope();
 
     void update(float dt);
@@ -52,6 +54,7 @@ public:
     void updateSprites();
     void removeSprites();
     std::vector<VStick*> getSticks();
+    VRope * cutRopeInStick(int nPoint, VStick * stick, b2Body*newBodyA, b2Body* newBodyB);
 private:
     int numPoints;
 	

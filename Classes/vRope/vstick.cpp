@@ -65,3 +65,8 @@ VPoint* VStick::getPointB()
 {
     return pointB;
 }
+
+void VStick::setPointB(VPoint* _pointB) {
+    pointB = _pointB;
+}
+

@@ -211,3 +211,63 @@ void VRope::removeSprites()
 std::vector<VStick*> VRope::getSticks() {
     return vSticks;
 }
+typedef struct {
+    unsigned int location;
+    unsigned int length;
+} NSRange;
+VRope* VRope::cutRopeInStick(int nPoint, VStick* stick, b2Body* newBodyA, b2Body* newBodyB) {
+    auto range = NSRange{nPoint, numPoints-nPoint-1};
+    
+    std::vector< VStick *> newRopeSticks( vSticks.begin() + range.location, vSticks.begin() + range.location + range.length );
+    vSticks.erase(vSticks.begin() + range.location, vSticks.begin() + range.location + range.length);
+    
+    std::vector<Sprite*> newRopeSprites(ropeSprites.begin() + range.location, ropeSprites.begin() + range.location + range.length);
+    ropeSprites.erase(ropeSprites.begin() + range.location, ropeSprites.begin() + range.location + range.length);
+    
+    range.length += 1;
+
+    std::vector<VPoint*> newRopePoints(vPoints.begin() + range.location, vPoints.begin() + range.location + range.length);
+    vPoints.erase(vPoints.begin() + range.location, vPoints.begin() + range.location + range.length);
+
+    VPoint *pointOfBreak = newRopePoints.at(0);
+    VPoint *newPoint = new VPoint();
+    newPoint->setPos(pointOfBreak->x, pointOfBreak->y);
+    vPoints.push_back(newPoint);
+
+    VStick *lastStick = vSticks.back();
+    lastStick->setPointB(newPoint);
+ 
+    float cutRatio = (float)nPoint / (numPoints - 1);
+    numPoints = nPoint + 1;
+
+    b2Vec2 newBodiesPosition  = b2Vec2(pointOfBreak->x / PTM_RATIO, pointOfBreak->y / PTM_RATIO);
+
+    b2World *world = newBodyA->GetWorld();
+
+    b2RopeJointDef jd;
+    jd.bodyA = joint->GetBodyA();
+    jd.bodyB = newBodyB;
+    jd.localAnchorA = joint->GetLocalAnchorA();
+    jd.localAnchorB = b2Vec2(0, 0);
+    jd.maxLength = joint->GetMaxLength() * cutRatio;
+    newBodyB->SetTransform(newBodiesPosition, 0.0);
+    b2RopeJoint *newJoint1 = (b2RopeJoint *)world->CreateJoint(&jd); //create joint
+
+    jd.bodyA = newBodyA;
+    jd.bodyB = joint->GetBodyB();
+    jd.localAnchorA = b2Vec2(0, 0);
+    jd.localAnchorB = joint->GetLocalAnchorB();
+    jd.maxLength = joint->GetMaxLength() * (1 - cutRatio);
+    newBodyA->SetTransform(newBodiesPosition, 0.0);
+    b2RopeJoint *newJoint2 = (b2RopeJoint *)world->CreateJoint(&jd);
+    
+    world->DestroyJoint(joint);
+    joint = newJoint1;
+
+    VRope* newRope = new VRope(newJoint2,spriteSheet,newRopePoints,newRopeSticks,newRopeSprites);
+    return newRope;
+}
+
+VRope::VRope(b2RopeJoint* joint, CCSpriteBatchNode* batchNode,std::vector<VPoint*> points,
+        std::vector< VStick *> sticks, std::vector<Sprite*> sprites )
+        : joint(joint), spriteSheet(batchNode), vPoints(points), vSticks(sticks), ropeSprites(sprites) {}

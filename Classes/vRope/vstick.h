@@ -39,7 +39,7 @@ public:
     void contract();
     VPoint* getPointA();
     VPoint* getPointB();
-
+    void setPointB(VPoint* _pointB);
 private:
 
 	VPoint *pointA;
