@@ -45,6 +45,7 @@ set(GAME_SRC
   Classes/vRope/vpoint.cpp
   Classes/vRope/vrope.cpp
   Classes/vRope/vstick.cpp
+  Classes/MyContactListener.cpp
 )
 elseif ( WIN32 )
 set(GAME_SRC
@@ -56,6 +57,7 @@ set(GAME_SRC
   Classes/vRope/vpoint.cpp
   Classes/vRope/vrope.cpp
   Classes/vRope/vstick.cpp
+  Classes/MyContactListener.cpp
 )
 endif()
 
