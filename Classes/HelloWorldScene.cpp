@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "libwebsockets.h"
 
 USING_NS_CC;
 #define cc_to_b2Vec(x,y)   (b2Vec2((x)/PTM_RATIO, (y)/PTM_RATIO))
@@ -63,6 +64,9 @@ bool HelloWorld::init()
     initLevel();
     this->scheduleUpdate();
     openCrocMouth(0);
+    
+    contactListener = new MyContactListener();
+    _world->SetContactListener(contactListener);
     
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
@@ -171,6 +175,115 @@ void HelloWorld::update(float dt) {
         ropes[i]->update(dt);
         ropes[i]->updateSprites();
     }
+    
+    
+    
+    
+     // Check for collisions
+    bool shouldCloseCrocMouth = false;
+    std::vector<b2Body *>toDestroy;
+    std::vector<MyContact>::iterator pos;
+    for(pos = contactListener->_contacts.begin(); pos != contactListener->_contacts.end(); ++pos)
+    {
+        MyContact contact = *pos;
+ 
+        bool hitTheFloor = false;
+        b2Body *potentialCandy = nullptr;
+ 
+        // The candy can hit the floor or the croc's mouth. Let's check
+        // what it's touching.
+        if (contact.fixtureA == crocMouthBottom_)
+        {
+            potentialCandy = contact.fixtureB->GetBody();
+        }
+        else if (contact.fixtureB == crocMouthBottom_)
+        {
+            potentialCandy = contact.fixtureA->GetBody();
+        }
+        else if (contact.fixtureA->GetBody() == groundBody)
+        {
+            potentialCandy = contact.fixtureB->GetBody();
+            hitTheFloor = true;
+        }
+        else if (contact.fixtureB->GetBody() == groundBody)
+        {
+            potentialCandy = contact.fixtureA->GetBody();
+            hitTheFloor = true;
+        }
+ 
+        // Check if the body was indeed one of the candies
+        if (potentialCandy /*&& [candies indexOfObject:[NSValue valueWithPointer:potentialCandy]] != NSNotFound*/)
+        {
+            // Set it to be destroyed
+            toDestroy.push_back(potentialCandy);
+            if (hitTheFloor)
+            {
+                // If it hits the floor you'll remove all the physics of it and just simulate the pineapple sinking
+                Sprite *sinkingCandy = (Sprite*)potentialCandy->GetUserData();
+ 
+                // Sink the pineapple
+                CCFiniteTimeAction *sink = MoveBy::create(3.0, Vec2(0, -sinkingCandy->getTextureRect().size.height));
+                
+                // Run the actions sequentially.
+                sinkingCandy->runAction(CCSequence::create(sink,
+                                         CallFuncN::create(this, callfuncN_selector(HelloWorld::removeCandy)),
+                                         NULL));
+                potentialCandy->SetUserData(NULL);
+            }
+            else
+            {
+                shouldCloseCrocMouth = true;
+            }
+        }
+    }
+    
+    
+    std::vector<b2Body *>::iterator pos2;
+    for(pos2 = toDestroy.begin(); pos2 != toDestroy.end(); ++pos2)
+    {
+        b2Body *body = *pos2;
+        if (body->GetUserData() != NULL)
+        {
+            // Remove the sprite
+            CCSprite *sprite = (CCSprite *) body->GetUserData();
+            removeChild(sprite, true);
+            body->SetUserData(NULL);
+        }
+ 
+        // Iterate though the joins and check if any are a rope
+        b2JointEdge* joints = body->GetJointList();
+        while (joints)
+        {
+            b2Joint *joint = joints->joint;
+ 
+            // Look in all the ropes
+            for (unsigned int i = 0; i < ropes.size(); i++) {
+                VRope * rope = ropes[i];
+                if (rope->joint == joint)
+                {
+                    // This "destroys" the rope
+                    rope->removeSprites();
+                    ropes.erase(ropes.begin() + i);
+                    break;
+                }
+            }
+ 
+            joints = joints->next;
+            _world->DestroyJoint(joint);
+        }
+ 
+        // Destroy the physics body
+        _world->DestroyBody(body);
+ 
+        // Removes from the candies array
+//        candies-> removeObject:[NSValue valueWithPointer:body]];
+    }
+ 
+    if (shouldCloseCrocMouth)
+    {
+        closeCrocMouth(0);
+        checkLevelFinish(false);
+    }
 }
 
 
@@ -262,4 +375,13 @@ void HelloWorld::closeCrocMouth(float dt) {
 
     float interval = 3.0 + 2.0 * rand_0_1();
     this->scheduleOnce(schedule_selector(HelloWorld::openCrocMouth), interval);
+}
+
+void HelloWorld::removeCandy(Node* node){
+    removeChild(node, true);
+    checkLevelFinish(true);
+}
+
+void HelloWorld::checkLevelFinish(bool forceFinish){
+    
 }

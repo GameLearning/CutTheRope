@@ -55,6 +55,7 @@ public:
     void removeSprites();
     std::vector<VStick*> getSticks();
     VRope * cutRopeInStick(int nPoint, VStick * stick, b2Body*newBodyA, b2Body* newBodyB);
+    b2RopeJoint *joint;
 private:
     int numPoints;
 	
@@ -64,7 +65,7 @@ private:
 	
     cocos2d::CCSpriteBatchNode* spriteSheet;
     float antiSagHack;
-    b2RopeJoint *joint;
+    
     b2Joint *jointAB;
 };
 

@@ -2,6 +2,7 @@
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
 #include "vRope/vrope.h"
+#include "MyContactListener.h"
 
 #define PTM_RATIO 32.0
 
@@ -22,6 +23,8 @@ private:
     b2Body * createRopeTipBody();
     void openCrocMouth(float dt);
     void closeCrocMouth(float dt);
+    void removeCandy(cocos2d::Node* node);
+    void checkLevelFinish(bool forceFinish);
     
     cocos2d::Sprite* croc_;
     std::vector<VRope*> ropes;
@@ -32,4 +35,6 @@ private:
     cocos2d::Size visibleSize;
     b2Body *crocMouth_;
     b2Fixture *crocMouthBottom_;
+    
+    MyContactListener *contactListener;
 };
