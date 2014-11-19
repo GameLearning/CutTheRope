@@ -156,6 +156,17 @@ void HelloWorld::initLevel(float dt)
     createRopeWith(body1 ,body1->GetLocalCenter(),
                         groundBody ,cc_to_b2Vec(s.width * 0.83, s.height * 0.6),
                           1.1);
+    
+     // Add the candy
+    b2Body *body2 = createCandyAt(Vec2(s.width * 0.5, s.height));
+ 
+    // Change the linear dumping so it swings more
+    body2->SetLinearDamping(0.01);
+ 
+    // Add a bunch of ropes
+    createRopeWith(groundBody, cc_to_b2Vec(s.width * 0.65, s.height + 5)
+                        , body2, body2->GetLocalCenter()
+                        , 1.0);
 }
 
 void HelloWorld::update(float dt) {

@@ -63,7 +63,7 @@ void VRope::reset()
 void VRope::createRope(const CCPoint& pointA, const CCPoint& pointB, float distance)
 {
 //    float distance = ccpDistance(pointA,pointB);
-    int segmentFactor = 20; // 16; //12; //increase value to have less segments per rope, decrease to have more segments
+    int segmentFactor = 12; // 16; //12; //increase value to have less segments per rope, decrease to have more segments
     numPoints = (int) distance/segmentFactor;
 
     CCPoint diffVector = ccpSub(pointB,pointA);
