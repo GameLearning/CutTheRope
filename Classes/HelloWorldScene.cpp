@@ -137,7 +137,7 @@ void HelloWorld::createRopeWith(b2Body*bodyA, b2Vec2 anchorA, b2Body*bodyB, b2Ve
 }
 
 
-void HelloWorld::initLevel()
+void HelloWorld::initLevel(float dt)
 {
     Size s = Director::getInstance()->getVisibleSize();
  
@@ -276,7 +276,7 @@ void HelloWorld::update(float dt) {
         _world->DestroyBody(body);
  
         // Removes from the candies array
-//        candies-> removeObject:[NSValue valueWithPointer:body]];
+        candies.erase( std::remove( std::begin(candies), std::end(candies), body ), std::end(candies) );
     }
  
     if (shouldCloseCrocMouth)
@@ -383,5 +383,40 @@ void HelloWorld::removeCandy(Node* node){
 }
 
 void HelloWorld::checkLevelFinish(bool forceFinish){
+    if (candies.size() == 0 || forceFinish)
+    {
+        // Destroy everything
+        finishedLevel();
+        this->scheduleOnce(schedule_selector(HelloWorld::initLevel), 2);
+    }
+}
+
+void HelloWorld::finishedLevel(){
+    std::set<b2Body *>toDestroy;
+    for (unsigned int i = 0; i < ropes.size(); i++) {
+        VRope* rope = ropes[i];
+        rope->removeSprites();
+        if (rope->joint->GetBodyA() != groundBody)
+            toDestroy.insert(rope->joint->GetBodyA());
+        if (rope->joint->GetBodyB() != groundBody)
+            toDestroy.insert(rope->joint->GetBodyB());
+        
+        _world->DestroyJoint(rope->joint);
+    }
+    ropes.clear();
     
+    std::set<b2Body *>::iterator pos;
+    for(pos = toDestroy.begin(); pos != toDestroy.end(); ++pos)
+    {
+        b2Body *body = *pos;
+        if (body->GetUserData() != NULL)
+        {
+            // Remove the sprite
+            CCSprite *sprite = (CCSprite *) body->GetUserData();
+            removeChild(sprite, true);
+            body->SetUserData(NULL);
+        }
+        _world->DestroyBody(body);
+    }
+    candies.clear();
 }
