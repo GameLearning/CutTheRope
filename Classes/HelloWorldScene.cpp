@@ -42,13 +42,7 @@ bool HelloWorld::init()
     b2EdgeShape groundShape;
     b2FixtureDef groundShapeDef;
     groundShapeDef.shape = &groundShape;
-    groundShape.Set(b2Vec2(0,0),b2Vec2(visibleSize.width /PTM_RATIO,0));
-    groundBody->CreateFixture(&groundShapeDef);
-    groundShape.Set(b2Vec2(0,0),b2Vec2(0,visibleSize.height /PTM_RATIO));
-    groundBody->CreateFixture(&groundShapeDef);
-    groundShape.Set(b2Vec2(visibleSize.width /PTM_RATIO,0),b2Vec2(visibleSize.width /PTM_RATIO,visibleSize.height /PTM_RATIO));
-    groundBody->CreateFixture(&groundShapeDef);
-    groundShape.Set(b2Vec2(visibleSize.width /PTM_RATIO,visibleSize.height /PTM_RATIO),b2Vec2(0,visibleSize.height /PTM_RATIO));
+    groundShape.Set(b2Vec2(-visibleSize.width/PTM_RATIO,0),b2Vec2(2*visibleSize.width /PTM_RATIO,0));
     groundBody->CreateFixture(&groundShapeDef);
     
     b2BodyDef crocBodyDef;
